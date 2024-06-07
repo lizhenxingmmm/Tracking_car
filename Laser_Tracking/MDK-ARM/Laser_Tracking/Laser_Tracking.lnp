@@ -35,8 +35,8 @@
 "laser_tracking\cmsis_os.o"
 "laser_tracking\heap_4.o"
 "laser_tracking\port.o"
-"../Middlewares/ST/ARM/DSP/Lib/arm_cortexM4l_math.lib"
 "laser_tracking\drv_uart.o"
+"../Middlewares/ST/ARM/DSP/Lib/arm_cortexM4l_math.lib"
 --strict --scatter "Laser_Tracking\Laser_Tracking.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

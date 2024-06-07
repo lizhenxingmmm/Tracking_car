@@ -32,3 +32,6 @@ laser_tracking\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal
 laser_tracking\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 laser_tracking\stm32f4xx_it.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 laser_tracking\stm32f4xx_it.o: ../Core/Inc/stm32f4xx_it.h
+laser_tracking\stm32f4xx_it.o: ../user/drv_uart.h
+laser_tracking\stm32f4xx_it.o: ../Core/Inc/usart.h
+laser_tracking\stm32f4xx_it.o: ../Core/Inc/dma.h

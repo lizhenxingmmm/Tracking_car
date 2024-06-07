@@ -48,3 +48,4 @@ laser_tracking\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/event_
 laser_tracking\main.o: ../Core/Inc/dma.h
 laser_tracking\main.o: ../Core/Inc/usart.h
 laser_tracking\main.o: ../Core/Inc/gpio.h
+laser_tracking\main.o: ../user/drv_uart.h

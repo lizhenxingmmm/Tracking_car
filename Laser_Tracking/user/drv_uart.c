@@ -103,7 +103,7 @@ void DRV_UART_IRQHandler(UART_HandleTypeDef *huart)
 static void dma_m0_rxcplt_callback(DMA_HandleTypeDef *hdma)
 {
     hdma->Instance->CR |= (uint32_t)(DMA_SxCR_CT); // 将当前目标内存设置为Memory1
-    /*处理数据*/
+                                                   /*处理数据*/
 
     /*处理数据*也可以不在这里处理*/
 }
@@ -114,7 +114,7 @@ static void dma_m0_rxcplt_callback(DMA_HandleTypeDef *hdma)
 static void dma_m1_rxcplt_callback(DMA_HandleTypeDef *hdma)
 {
     hdma->Instance->CR &= ~(uint32_t)(DMA_SxCR_CT); // 将当前目标内存设置为Memory0
-    /*处理数据*/
+                                                    /*处理数据*/
 
     /*处理数据*也可以不在这里处理*/
 }
