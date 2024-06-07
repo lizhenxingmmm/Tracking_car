@@ -1,8 +1,5 @@
 #include "drv_uart.h"
 
-//默认所有uart接收内存为2x200
-#define UART_RX_BUF_LEN (200)
-
 //开辟uart接收双缓冲区
 volatile uint8_t uart1_rx_buf[2][UART_RX_BUF_LEN] = {0};
 volatile uint8_t uart2_rx_buf[2][UART_RX_BUF_LEN] = {0};
@@ -10,7 +7,12 @@ volatile uint8_t uart3_rx_buf[2][UART_RX_BUF_LEN] = {0};
 volatile uint8_t uart4_rx_buf[2][UART_RX_BUF_LEN] = {0};
 volatile uint8_t uart5_rx_buf[2][UART_RX_BUF_LEN] = {0};
 volatile uint8_t uart6_rx_buf[2][UART_RX_BUF_LEN] = {0};
-
+volatile uint8_t uart1_rx_buf_lable; //鉴定当前数据的内存编号
+volatile uint8_t uart2_rx_buf_lable; //鉴定当前数据的内存编号
+volatile uint8_t uart3_rx_buf_lable; //鉴定当前数据的内存编号
+volatile uint8_t uart4_rx_buf_lable; //鉴定当前数据的内存编号
+volatile uint8_t uart5_rx_buf_lable; //鉴定当前数据的内存编号
+volatile uint8_t uart6_rx_buf_lable; //鉴定当前数据的内存编号
 // uart接收数据包有效长度
 int uart1_rx_data_frame_len;
 int uart2_rx_data_frame_len;
@@ -103,7 +105,7 @@ void DRV_UART_IRQHandler(UART_HandleTypeDef *huart)
 static void dma_m0_rxcplt_callback(DMA_HandleTypeDef *hdma)
 {
     hdma->Instance->CR |= (uint32_t)(DMA_SxCR_CT); // 将当前目标内存设置为Memory1
-                                                   /*处理数据*/
+    /*处理数据*/
 
     /*处理数据*也可以不在这里处理*/
 }
@@ -114,7 +116,7 @@ static void dma_m0_rxcplt_callback(DMA_HandleTypeDef *hdma)
 static void dma_m1_rxcplt_callback(DMA_HandleTypeDef *hdma)
 {
     hdma->Instance->CR &= ~(uint32_t)(DMA_SxCR_CT); // 将当前目标内存设置为Memory0
-                                                    /*处理数据*/
+    /*处理数据*/
 
     /*处理数据*也可以不在这里处理*/
 }
