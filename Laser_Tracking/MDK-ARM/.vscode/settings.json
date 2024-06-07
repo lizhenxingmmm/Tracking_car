@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "drv_uart.h": "c",
+        "usart.h": "c"
+    }
+}
