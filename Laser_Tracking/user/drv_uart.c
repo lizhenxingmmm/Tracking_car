@@ -1,3 +1,11 @@
+/**
+ * @Author: Li Zhenxing
+ * @Date: 2024/6/10 01:27:44
+ * @LastEditors: Li Zhenxing
+ * @LastEditTime: 2024/6/10 01:27:44
+ * Description: 
+ * Copyright: Copyright (©)}) 2024 Li Zhenxing. All rights reserved.
+ */
 #include "drv_uart.h"
 
 //开辟uart接收双缓冲区

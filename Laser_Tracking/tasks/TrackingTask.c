@@ -1,3 +1,11 @@
+/**
+ * @Author: Li Zhenxing
+ * @Date: 2024/6/10 01:27:22
+ * @LastEditors: Li Zhenxing
+ * @LastEditTime: 2024/6/10 01:27:22
+ * Description:
+ * Copyright: Copyright (©)}) 2024 Li Zhenxing. All rights reserved.
+ */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "main.h"

@@ -1,3 +1,11 @@
+/**
+ * @Author: Li Zhenxing
+ * @Date: 2024/6/10 01:27:55
+ * @LastEditors: Li Zhenxing
+ * @LastEditTime: 2024/6/10 01:27:55
+ * Description: 
+ * Copyright: Copyright (©)}) 2024 Li Zhenxing. All rights reserved.
+ */
 #include "crc8_8540.h"
 // crc8 generator polynomial:G(x)=x8+x5+x4+1
 const unsigned char CRC8_INIT_ = 0xff;

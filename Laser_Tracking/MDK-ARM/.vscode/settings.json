@@ -3,6 +3,7 @@
         "drv_uart.h": "c",
         "usart.h": "c",
         "n10laser.h": "c",
-        "crc8_8540.h": "c"
+        "crc8_8540.h": "c",
+        "freertos.h": "c"
     }
 }
