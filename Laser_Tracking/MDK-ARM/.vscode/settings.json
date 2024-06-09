@@ -2,6 +2,7 @@
     "files.associations": {
         "drv_uart.h": "c",
         "usart.h": "c",
-        "n10laser.h": "c"
+        "n10laser.h": "c",
+        "crc8_8540.h": "c"
     }
 }

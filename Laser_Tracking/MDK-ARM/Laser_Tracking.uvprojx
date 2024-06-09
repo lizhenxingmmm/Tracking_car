@@ -746,6 +746,11 @@
               <FileType>1</FileType>
               <FilePath>..\user\drv_uart.c</FilePath>
             </File>
+            <File>
+              <FileName>crc8_8540.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\crc8_8540.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

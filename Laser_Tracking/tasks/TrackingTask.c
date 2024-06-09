@@ -5,9 +5,11 @@
 #include "drv_uart.h"
 #include "N10laser.h"
 #include <string.h>
+#include "crc8_8540.h"
 extern volatile uint8_t uart5_rx_buf[2][UART_RX_BUF_LEN];
 extern int uart5_rx_data_frame_len;
 N10laser N10laser_;
+uint32_t error_occur = 0;
 
 void N10laser_decode(volatile uint8_t buf[]);
 
@@ -36,5 +38,9 @@ void N10laser_decode(volatile uint8_t buf[])
         }
         N10laser_.end_angle = ((uint16_t)buf[55] << 8) + buf[56];
         N10laser_.crc_check_sum = buf[57];
+    }
+    if (Verify_CRC8_Check_Sum(buf, uart5_rx_data_frame_len) == 0)
+    {
+        error_occur++;
     }
 }
