@@ -2,7 +2,7 @@
 Build target 'Laser_Tracking'
 compiling TrackingTask.c...
 linking...
-Program Size: Code=15104 RO-data=536 RW-data=160 ZI-data=20888  
+Program Size: Code=15440 RO-data=536 RW-data=184 ZI-data=20832  
 FromELF: creating hex file...
 "Laser_Tracking\Laser_Tracking.axf" - 0 Error(s), 0 Warning(s).
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02

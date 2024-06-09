@@ -7,12 +7,7 @@ volatile uint8_t uart3_rx_buf[2][UART_RX_BUF_LEN] = {0};
 volatile uint8_t uart4_rx_buf[2][UART_RX_BUF_LEN] = {0};
 volatile uint8_t uart5_rx_buf[2][UART_RX_BUF_LEN] = {0};
 volatile uint8_t uart6_rx_buf[2][UART_RX_BUF_LEN] = {0};
-volatile uint8_t uart1_rx_buf_lable; //鉴定当前数据的内存编号
-volatile uint8_t uart2_rx_buf_lable; //鉴定当前数据的内存编号
-volatile uint8_t uart3_rx_buf_lable; //鉴定当前数据的内存编号
-volatile uint8_t uart4_rx_buf_lable; //鉴定当前数据的内存编号
-volatile uint8_t uart5_rx_buf_lable; //鉴定当前数据的内存编号
-volatile uint8_t uart6_rx_buf_lable; //鉴定当前数据的内存编号
+
 // uart接收数据包有效长度
 int uart1_rx_data_frame_len;
 int uart2_rx_data_frame_len;
@@ -20,6 +15,18 @@ int uart3_rx_data_frame_len;
 int uart4_rx_data_frame_len;
 int uart5_rx_data_frame_len;
 int uart6_rx_data_frame_len;
+
+//处理数据忙检测
+uint8_t callback_busy = 0;
+//当前触发的uart
+UART_HandleTypeDef *current_huart = NULL;
+
+static void (*uart1_buf_decode)(volatile uint8_t uart1_rx_buf[UART_RX_BUF_LEN]) = NULL;
+static void (*uart2_buf_decode)(volatile uint8_t uart2_rx_buf[UART_RX_BUF_LEN]) = NULL;
+static void (*uart3_buf_decode)(volatile uint8_t uart3_rx_buf[UART_RX_BUF_LEN]) = NULL;
+static void (*uart4_buf_decode)(volatile uint8_t uart4_rx_buf[UART_RX_BUF_LEN]) = NULL;
+static void (*uart5_buf_decode)(volatile uint8_t uart5_rx_buf[UART_RX_BUF_LEN]) = NULL;
+static void (*uart6_buf_decode)(volatile uint8_t uart6_rx_buf[UART_RX_BUF_LEN]) = NULL;
 
 static void uart_rx_idle_callback(UART_HandleTypeDef *huart);
 static HAL_StatusTypeDef DMAEx_MultiBufferStart_NoIT(DMA_HandleTypeDef *hdma,
@@ -30,7 +37,7 @@ static HAL_StatusTypeDef DMAEx_MultiBufferStart_NoIT(DMA_HandleTypeDef *hdma,
 /**
  * @brief uart初始化dma双缓冲接收,开启空闲中断
  */
-void USART_Init(UART_HandleTypeDef *huart) //开启空闲中断，配置DMA相关参数，使能DMA接收
+void USART_Init(UART_HandleTypeDef *huart, void (*decode_func)(volatile uint8_t[])) //开启空闲中断，配置DMA相关参数，使能DMA接收
 {
     __HAL_UART_CLEAR_IDLEFLAG(huart);          //先清楚空闲中断标志位，防止开启中断时立马进入中断
     __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE); //使能空闲中断
@@ -43,6 +50,7 @@ void USART_Init(UART_HandleTypeDef *huart) //开启空闲中断，配置DMA相�
                                     (uint32_t)uart1_rx_buf[0],
                                     (uint32_t)uart1_rx_buf[1],
                                     UART_RX_BUF_LEN);
+        uart1_buf_decode = decode_func; //链接解码函数
     }
     if (huart->Instance == USART2)
     {
@@ -51,6 +59,7 @@ void USART_Init(UART_HandleTypeDef *huart) //开启空闲中断，配置DMA相�
                                     (uint32_t)uart2_rx_buf[0],
                                     (uint32_t)uart2_rx_buf[1],
                                     UART_RX_BUF_LEN);
+        uart2_buf_decode = decode_func; //链接解码函数
     }
     if (huart->Instance == USART3)
     {
@@ -59,6 +68,7 @@ void USART_Init(UART_HandleTypeDef *huart) //开启空闲中断，配置DMA相�
                                     (uint32_t)uart3_rx_buf[0],
                                     (uint32_t)uart3_rx_buf[1],
                                     UART_RX_BUF_LEN);
+        uart3_buf_decode = decode_func; //链接解码函数
     }
     if (huart->Instance == UART4)
     {
@@ -67,6 +77,7 @@ void USART_Init(UART_HandleTypeDef *huart) //开启空闲中断，配置DMA相�
                                     (uint32_t)uart4_rx_buf[0],
                                     (uint32_t)uart4_rx_buf[1],
                                     UART_RX_BUF_LEN);
+        uart4_buf_decode = decode_func; //链接解码函数
     }
     if (huart->Instance == UART5)
     {
@@ -75,6 +86,7 @@ void USART_Init(UART_HandleTypeDef *huart) //开启空闲中断，配置DMA相�
                                     (uint32_t)uart5_rx_buf[0],
                                     (uint32_t)uart5_rx_buf[1],
                                     UART_RX_BUF_LEN);
+        uart5_buf_decode = decode_func; //链接解码函数
     }
     if (huart->Instance == USART6)
     {
@@ -83,6 +95,7 @@ void USART_Init(UART_HandleTypeDef *huart) //开启空闲中断，配置DMA相�
                                     (uint32_t)uart6_rx_buf[0],
                                     (uint32_t)uart6_rx_buf[1],
                                     UART_RX_BUF_LEN);
+        uart6_buf_decode = decode_func; //链接解码函数
     }
 }
 /**
@@ -91,10 +104,14 @@ void USART_Init(UART_HandleTypeDef *huart) //开启空闲中断，配置DMA相�
  */
 void DRV_UART_IRQHandler(UART_HandleTypeDef *huart)
 {
-    if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) &&
-        __HAL_UART_GET_IT_SOURCE(huart, UART_IT_IDLE)) //判断是否为空闲中断
+    //若uart处于忙状态，中断请求不成功
+    if (callback_busy == 0)
     {
-        uart_rx_idle_callback(huart);
+        if (__HAL_UART_GET_FLAG(huart, UART_FLAG_IDLE) &&
+            __HAL_UART_GET_IT_SOURCE(huart, UART_IT_IDLE)) //判断是否为空闲中断
+        {
+            uart_rx_idle_callback(huart);
+        }
     }
 }
 
@@ -106,8 +123,37 @@ static void dma_m0_rxcplt_callback(DMA_HandleTypeDef *hdma)
 {
     hdma->Instance->CR |= (uint32_t)(DMA_SxCR_CT); // 将当前目标内存设置为Memory1
     /*处理数据*/
-
-    /*处理数据*也可以不在这里处理*/
+    if (current_huart->Instance == USART1)
+    {
+        if (uart1_buf_decode != NULL)
+            uart1_buf_decode(uart1_rx_buf[0]);
+    }
+    if (current_huart->Instance == USART2)
+    {
+        if (uart2_buf_decode != NULL)
+            uart2_buf_decode(uart2_rx_buf[0]);
+    }
+    if (current_huart->Instance == USART3)
+    {
+        if (uart3_buf_decode != NULL)
+            uart3_buf_decode(uart3_rx_buf[0]);
+    }
+    if (current_huart->Instance == UART4)
+    {
+        if (uart4_buf_decode != NULL)
+            uart4_buf_decode(uart4_rx_buf[0]);
+    }
+    if (current_huart->Instance == UART5)
+    {
+        if (uart5_buf_decode != NULL)
+            uart5_buf_decode(uart5_rx_buf[0]);
+    }
+    if (current_huart->Instance == USART6)
+    {
+        if (uart6_buf_decode != NULL)
+            uart6_buf_decode(uart6_rx_buf[0]);
+    }
+    /*处理数据*/
 }
 /**
  * @brief dma双缓冲内存1搬运完成回调函数，并将目标内存指定为内存0
@@ -117,16 +163,49 @@ static void dma_m1_rxcplt_callback(DMA_HandleTypeDef *hdma)
 {
     hdma->Instance->CR &= ~(uint32_t)(DMA_SxCR_CT); // 将当前目标内存设置为Memory0
     /*处理数据*/
-
-    /*处理数据*也可以不在这里处理*/
+    if (current_huart->Instance == USART1)
+    {
+        if (uart1_buf_decode != NULL)
+            uart1_buf_decode(uart1_rx_buf[1]);
+    }
+    if (current_huart->Instance == USART2)
+    {
+        if (uart2_buf_decode != NULL)
+            uart2_buf_decode(uart2_rx_buf[1]);
+    }
+    if (current_huart->Instance == USART3)
+    {
+        if (uart3_buf_decode != NULL)
+            uart3_buf_decode(uart3_rx_buf[1]);
+    }
+    if (current_huart->Instance == UART4)
+    {
+        if (uart4_buf_decode != NULL)
+            uart4_buf_decode(uart4_rx_buf[1]);
+    }
+    if (current_huart->Instance == UART5)
+    {
+        if (uart5_buf_decode != NULL)
+            uart5_buf_decode(uart5_rx_buf[1]);
+    }
+    if (current_huart->Instance == USART6)
+    {
+        if (uart6_buf_decode != NULL)
+            uart6_buf_decode(uart6_rx_buf[1]);
+    }
+    /*处理数据*/
 }
 /**
  * @brief uart接收中断回调函数
  */
 static void uart_rx_idle_callback(UART_HandleTypeDef *huart)
 {
+    //标志uart正忙
+    callback_busy = 1;
     __HAL_UART_CLEAR_IDLEFLAG(huart);
     __HAL_DMA_DISABLE(huart->hdmarx);
+    //用全局变量传信息给dma_callback
+    current_huart = huart;
     //计算接收数据长度
     if (huart->Instance == USART1)
     {
@@ -161,6 +240,8 @@ static void uart_rx_idle_callback(UART_HandleTypeDef *huart)
     /* restart dma transmission */
     __HAL_DMA_SET_COUNTER(huart->hdmarx, UART_RX_BUF_LEN);
     __HAL_DMA_ENABLE(huart->hdmarx);
+    //好了，不忙了
+    callback_busy = 0;
 }
 
 static HAL_StatusTypeDef DMAEx_MultiBufferStart_NoIT(DMA_HandleTypeDef *hdma,

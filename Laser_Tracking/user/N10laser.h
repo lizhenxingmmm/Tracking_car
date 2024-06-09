@@ -12,7 +12,7 @@ typedef __packed struct
     unsigned char header1;
     unsigned char header2;
     unsigned char frame_len;
-    unsigned short period; //码盘转1/24圈的时间
+    unsigned short period; //码盘转1/24圈的时间 单位us
     unsigned short start_angle;
     PointCloudData pcdt[16];
     unsigned short end_angle;

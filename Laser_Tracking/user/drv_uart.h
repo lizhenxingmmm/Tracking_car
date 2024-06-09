@@ -9,6 +9,6 @@
 #define UART_RX_BUF_LEN (200)
 
 void DRV_UART_IRQHandler(UART_HandleTypeDef *huart);
-void USART_Init(UART_HandleTypeDef *huart);
+void USART_Init(UART_HandleTypeDef *huart, void (*decode_func)(volatile uint8_t[]));
 
 #endif

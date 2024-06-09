@@ -93,7 +93,6 @@ int main(void)
   MX_UART4_Init();
   MX_UART5_Init();
   /* USER CODE BEGIN 2 */
-  USART_Init(&huart5);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
