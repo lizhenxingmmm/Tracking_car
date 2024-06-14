@@ -18,6 +18,10 @@ extern volatile uint8_t uart5_rx_buf[2][UART_RX_BUF_LEN];
 extern int uart5_rx_data_frame_len;
 N10laser N10laser_;
 uint32_t error_occur = 0;
+uint32_t total_count = 0;
+float LossPackRate = 0;
+uint16_t start_angles_debug[1000];
+uint16_t end_angle_debug[1000];
 
 void N10laser_decode(volatile uint8_t buf[]);
 
@@ -26,9 +30,10 @@ extern void StartTrackingTask(void const *argument)
     USART_Init(&huart5, N10laser_decode);
     for (;;)
     {
+        LossPackRate = (float)error_occur / total_count;
     }
 }
-
+uint32_t debug_count = 0;
 void N10laser_decode(volatile uint8_t buf[])
 {
     //帧头识别
@@ -46,7 +51,14 @@ void N10laser_decode(volatile uint8_t buf[])
         }
         N10laser_.end_angle = ((uint16_t)buf[55] << 8) + buf[56];
         N10laser_.crc_check_sum = buf[57];
+        if (debug_count < 1000)
+        {
+            debug_count++;
+        }
+        start_angles_debug[debug_count] = N10laser_.start_angle;
+        end_angle_debug[debug_count] = N10laser_.end_angle;
     }
+    total_count++;
     if (Verify_CRC8_Check_Sum(buf, uart5_rx_data_frame_len) == 0)
     {
         error_occur++;
