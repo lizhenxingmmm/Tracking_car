@@ -29,7 +29,7 @@ Project File Date:  06/10/2024
 Build target 'Laser_Tracking'
 compiling TrackingTask.c...
 ..\tasks\TrackingTask.c(34): warning:  #167-D: argument of type "volatile uint8_t *" is incompatible with parameter of type "unsigned char *"
-      if (Verify_CRC8_Check_Sum(buf, uart5_rx_data_frame_len) == 0)
+      if (Verify_CRC8_Check_Sum(buf, uart5_rx_data_frame_len))
 ..\tasks\TrackingTask.c: 1 warning, 0 errors
 linking...
 Program Size: Code=15784 RO-data=796 RW-data=188 ZI-data=20892  
@@ -58,7 +58,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.5.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:03
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>
