@@ -108,7 +108,7 @@ void MX_FREERTOS_Init(void)
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-  osThreadDef(Tracking, StartTrackingTask, osPriorityNormal, 0, 128);
+  osThreadDef(Tracking, StartTrackingTask, osPriorityAboveNormal, 0, 2048);
   TrackingTaskHandle = osThreadCreate(osThread(Tracking), NULL);
   /* USER CODE END RTOS_THREADS */
 }

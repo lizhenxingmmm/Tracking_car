@@ -29,21 +29,19 @@ uint16_t target_index = 0;
 void N10laser_decode(volatile uint8_t buf[]);
 int partition(POLAR_COORDINATE points[], int low, int high);
 void quick_sort(POLAR_COORDINATE points[], int low, int high);
-POLAR_COORDINATE debug_p[2000];
+void bubble_sort(POLAR_COORDINATE points[], int low, int high);
 
-extern void StartTrackingTask(void const *argument)
+void StartTrackingTask(void const *argument)
 {
     USART_Init(&huart5, N10laser_decode);
-    for (int i = 0; i < 2000; i++)
-    {
-        debug_p[i].theta = 2222.34f - 0.99f * i;
-    }
     for (;;)
     {
         //算丢包率
         LossPackRate = (float)error_occur / total_count;
         //整理数据
-        //quick_sort(debug_p, 0, 10);
+        // quick_sort(debug_p, 0, 300);
+        //递归会出为问题
+        bubble_sort(polar_coordinate_points, 0, 1999);
     }
 }
 void N10laser_decode(volatile uint8_t buf[])
@@ -127,5 +125,25 @@ void quick_sort(POLAR_COORDINATE points[], int low, int high)
     else
     {
         return;
+    }
+}
+/**
+ * @param low 分区低位索引
+ * @param high 高位索引
+ */
+void bubble_sort(POLAR_COORDINATE points[], int low, int high)
+{
+    POLAR_COORDINATE temp_point;
+    for (int i = 0; i <= high - 1; i++)
+    {
+        for (int j = 0; j <= high - 1 - i; j++)
+        {
+            if (points[j].theta > points[j + 1].theta)
+            {
+                memcpy(&temp_point, &points[j + 1], sizeof(POLAR_COORDINATE));
+                memcpy(&points[j + 1], &points[j], sizeof(POLAR_COORDINATE));
+                memcpy(&points[j], &temp_point, sizeof(POLAR_COORDINATE));
+            }
+        }
     }
 }
