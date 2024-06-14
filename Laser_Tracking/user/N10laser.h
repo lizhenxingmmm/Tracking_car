@@ -19,4 +19,10 @@ typedef __packed struct
     unsigned char crc_check_sum;
 } N10laser;
 
+typedef __packed struct
+{
+    float rho;   //单位毫米
+    float theta; //单位°
+} POLAR_COORDINATE;
+
 #endif

@@ -4,6 +4,7 @@
         "usart.h": "c",
         "n10laser.h": "c",
         "crc8_8540.h": "c",
-        "freertos.h": "c"
+        "freertos.h": "c",
+        "vector_spec.h": "c"
     }
 }
