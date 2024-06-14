@@ -14,6 +14,9 @@
 #include "N10laser.h"
 #include <string.h>
 #include "crc8_8540.h"
+#include "bsp_dwt.h"
+#include <math.h>
+
 extern volatile uint8_t uart5_rx_buf[2][UART_RX_BUF_LEN];
 extern int uart5_rx_data_frame_len;
 N10laser N10laser_;
@@ -23,17 +26,25 @@ float LossPackRate = 0;
 uint16_t forward_angle = 10723; //测出来的
 uint16_t start2end = 1200;      //一帧报文扫过的角度
 //创建坐标空间
-POLAR_COORDINATE polar_coordinate_points[2000];
+//两个空间，防止排序中写入数据导致数据更新出问题
+POLAR_COORDINATE polar_coordinate_points[1000]; //未排序坐标空间
+POLAR_COORDINATE sorted_points[1000];           //已经排序坐标空间
 uint16_t target_index = 0;
+POLAR_COORDINATE modified_points[180]; //每2°一个点位 0° 2° ~358°
 
 void N10laser_decode(volatile uint8_t buf[]);
 int partition(POLAR_COORDINATE points[], int low, int high);
 void quick_sort(POLAR_COORDINATE points[], int low, int high);
 void bubble_sort(POLAR_COORDINATE points[], int low, int high);
+void filte_point(POLAR_COORDINATE sorted_point[1000], POLAR_COORDINATE modified_points[180]);
+
+uint32_t timeline;
+double dt;
 
 void StartTrackingTask(void const *argument)
 {
     USART_Init(&huart5, N10laser_decode);
+    DWT_Init(168);
     for (;;)
     {
         //算丢包率
@@ -41,7 +52,16 @@ void StartTrackingTask(void const *argument)
         //整理数据
         // quick_sort(debug_p, 0, 300);
         //递归会出为问题
-        bubble_sort(polar_coordinate_points, 0, 1999);
+        memcpy(&sorted_points[0], &polar_coordinate_points[0], 1000 * sizeof(POLAR_COORDINATE));
+        //好像不用排序，难绷
+        // bubble_sort(sorted_points, 0, 999); //约0.07s更新一次
+        for (int i = 0; i < 4; i++)
+        {
+            sorted_points[i].theta = 1;
+            sorted_points[i].rho = 1 + i * 0.45f;
+        }
+        filte_point(sorted_points, modified_points);
+        dt = DWT_GetDeltaT(&timeline);
     }
 }
 void N10laser_decode(volatile uint8_t buf[])
@@ -72,7 +92,7 @@ void N10laser_decode(volatile uint8_t buf[])
                 temp_coordinate.theta = (float)(N10laser_.start_angle + ((float)i) * start2end / 15) / 100;
                 memcpy(&polar_coordinate_points[target_index], &temp_coordinate, sizeof(POLAR_COORDINATE));
                 target_index++;
-                if (target_index >= 2000)
+                if (target_index >= 1000)
                 {
                     target_index = 0;
                 }
@@ -144,6 +164,34 @@ void bubble_sort(POLAR_COORDINATE points[], int low, int high)
                 memcpy(&points[j + 1], &points[j], sizeof(POLAR_COORDINATE));
                 memcpy(&points[j], &temp_point, sizeof(POLAR_COORDINATE));
             }
+        }
+    }
+}
+
+void filte_point(POLAR_COORDINATE sorted_points_[1000], POLAR_COORDINATE modified_pts[180])
+{
+    int num[180] = {0, 0, 0, 0};
+    for (int i = 0; i < 1000; i++)
+    {
+        for (int j = 0; j < 180; j++)
+        {
+            if (fabs(sorted_points_[i].theta - (2 * j + 1)) < 1 || sorted_points_[i].theta == 2 * j)
+            {
+                num[j]++;
+                modified_pts[j].rho += sorted_points_[i].rho;
+            }
+        }
+    }
+    for (int i = 0; i < 180; i++)
+    {
+        modified_pts[i].theta = 2 * i;
+        if (num[i] == 0)
+        {
+            modified_pts[i].rho = 0;
+        }
+        else
+        {
+            modified_pts[i].rho /= num[i];
         }
     }
 }

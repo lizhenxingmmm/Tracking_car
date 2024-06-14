@@ -751,6 +751,11 @@
               <FileType>1</FileType>
               <FilePath>..\user\crc8_8540.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_dwt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\user\bsp_dwt.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

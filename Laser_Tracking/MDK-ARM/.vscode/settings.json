@@ -5,6 +5,7 @@
         "n10laser.h": "c",
         "crc8_8540.h": "c",
         "freertos.h": "c",
-        "vector_spec.h": "c"
+        "vector_spec.h": "c",
+        "bsp_dwt.h": "c"
     }
 }

@@ -51,3 +51,5 @@ laser_tracking\trackingtask.o: ../Core/Inc/dma.h
 laser_tracking\trackingtask.o: ../user/N10laser.h
 laser_tracking\trackingtask.o: D:\keil\ARM\ARMCC\Bin\..\include\string.h
 laser_tracking\trackingtask.o: ../user/crc8_8540.h
+laser_tracking\trackingtask.o: ../user/bsp_dwt.h
+laser_tracking\trackingtask.o: D:\keil\ARM\ARMCC\Bin\..\include\math.h
