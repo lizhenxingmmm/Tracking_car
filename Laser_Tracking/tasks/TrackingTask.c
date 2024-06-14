@@ -31,6 +31,11 @@ extern void StartTrackingTask(void const *argument)
 
 void N10laser_decode(volatile uint8_t buf[])
 {
+    if (Verify_CRC8_Check_Sum(buf, uart5_rx_data_frame_len))
+    {
+        error_occur++;
+        return;
+    }
     //帧头识别
     if (buf[0] == 0xa5 && buf[1] == 0x5a)
     {
@@ -46,9 +51,5 @@ void N10laser_decode(volatile uint8_t buf[])
         }
         N10laser_.end_angle = ((uint16_t)buf[55] << 8) + buf[56];
         N10laser_.crc_check_sum = buf[57];
-    }
-    if (Verify_CRC8_Check_Sum(buf, uart5_rx_data_frame_len) == 0)
-    {
-        error_occur++;
     }
 }

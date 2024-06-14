@@ -21,17 +21,20 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.9.0
 Dialog DLL:      TCM.DLL V1.53.0.0
  
 <h2>Project:</h2>
-d:\multi_function\desk\new_start\Tracking_car\Laser_Tracking\MDK-ARM\Laser_Tracking.uvprojx
+D:\multi_function\desk\new_start\Tracking_car\Laser_Tracking\MDK-ARM\Laser_Tracking.uvprojx
 Project File Date:  06/10/2024
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\keil\ARM\ARMCC\Bin'
 Build target 'Laser_Tracking'
-compiling crc8_8540.c...
+compiling TrackingTask.c...
+..\tasks\TrackingTask.c(34): warning:  #167-D: argument of type "volatile uint8_t *" is incompatible with parameter of type "unsigned char *"
+      if (Verify_CRC8_Check_Sum(buf, uart5_rx_data_frame_len) == 0)
+..\tasks\TrackingTask.c: 1 warning, 0 errors
 linking...
-Program Size: Code=15780 RO-data=796 RW-data=188 ZI-data=20892  
+Program Size: Code=15784 RO-data=796 RW-data=188 ZI-data=20892  
 FromELF: creating hex file...
-"Laser_Tracking\Laser_Tracking.axf" - 0 Error(s), 0 Warning(s).
+"Laser_Tracking\Laser_Tracking.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -55,7 +58,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.5.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:00
+Build Time Elapsed:  00:00:03
 </pre>
 </body>
 </html>
