@@ -38,6 +38,7 @@
 "laser_tracking\drv_uart.o"
 "laser_tracking\crc8_8540.o"
 "laser_tracking\bsp_dwt.o"
+"laser_tracking\ransac.o"
 "../Middlewares/ST/ARM/DSP/Lib/arm_cortexM4l_math.lib"
 "laser_tracking\trackingtask.o"
 --strict --scatter "Laser_Tracking\Laser_Tracking.sct"

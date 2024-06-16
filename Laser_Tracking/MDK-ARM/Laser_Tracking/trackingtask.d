@@ -55,3 +55,6 @@ laser_tracking\trackingtask.o: ../user/bsp_dwt.h
 laser_tracking\trackingtask.o: D:\keil\ARM\ARMCC\Bin\..\include\math.h
 laser_tracking\trackingtask.o: ../Middlewares/ST/ARM/DSP/Inc/arm_math.h
 laser_tracking\trackingtask.o: ../Drivers/CMSIS/Include/core_cm4.h
+laser_tracking\trackingtask.o: ../user/RANSAC.h
+laser_tracking\trackingtask.o: D:\keil\ARM\ARMCC\Bin\..\include\stdlib.h
+laser_tracking\trackingtask.o: D:\keil\ARM\ARMCC\Bin\..\include\time.h

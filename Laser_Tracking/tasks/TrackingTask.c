@@ -17,6 +17,7 @@
 #include "bsp_dwt.h"
 #include <math.h>
 #include "arm_math.h"
+#include "RANSAC.h"
 
 #define RAW_POINTS_DATA_SPACE (1000)
 #define FITERED_POINTS_DATA_SPACE (180)
@@ -49,44 +50,46 @@ float GetCuvature(POLAR_COORDINATE *current_point, POLAR_COORDINATE *next_point,
 uint32_t timeline;
 double dt;
 
-float debug__;
+CARTESIANCOORDINATE debug_xy[12];
+RANSAC_def debug_ransac;
+RANSAC_STATE state;
 
 void StartTrackingTask(void const *argument)
 {
     USART_Init(&huart5, N10laser_decode);
+    RANSAC_Init(&debug_ransac, CIRCLE, 0.41, 1.0f / 6, 0.99, 10);
     DWT_Init(168);
     for (;;)
     {
         //算丢包率
         LossPackRate = (float)error_occur / total_count;
         //整理数据
-        // quick_sort(debug_p, 0, 300);
-        //递归会出为问题
         memcpy(&sorted_points[0], &polar_coordinate_points[0], RAW_POINTS_DATA_SPACE * sizeof(POLAR_COORDINATE));
-        //好像不用排序，难绷
-        bubble_sort(sorted_points, 0, 999); //约0.07s更新一次
-        filter_point(sorted_points, modified_points);
-        //算各点曲率
-        for (int i = 0; i < FITERED_POINTS_DATA_SPACE; i++)
-        {
-            if (i == FITERED_POINTS_DATA_SPACE - 1 - 1)
-            {
-                cuvatures[i] = GetCuvature(&modified_points[i], &modified_points[i + 1], &modified_points[0]);
-            }
-            if (i == FITERED_POINTS_DATA_SPACE - 1)
-            {
-                cuvatures[i] = GetCuvature(&modified_points[i], &modified_points[0], &modified_points[1]);
-            }
-            else
-            {
-                cuvatures[i] = GetCuvature(&modified_points[i], &modified_points[i + 1], &modified_points[i + 2]);
-            }
-        }
-        // 5.27535534，4.7853508，5.27535534
-        POLAR_COORDINATE de = {10.27535534f};
-        POLAR_COORDINATE dee = {10.27535534f};
-        POLAR_COORDINATE deee = {10.27535534f};
-        debug__ = GetCuvature(&de, &dee, &deee);
+        debug_xy[0].x = 1;
+        debug_xy[0].y = 1;
+        debug_xy[1].x = 2.2f;
+        debug_xy[1].y = 0.1f;
+        debug_xy[2].x = 1;
+        debug_xy[2].y = 2;
+        debug_xy[3].x = 2;
+        debug_xy[3].y = 4;
+        debug_xy[4].x = 3;
+        debug_xy[4].y = 0;
+        debug_xy[5].x = 3;
+        debug_xy[5].y = 4.5f;
+        debug_xy[6].x = 4;
+        debug_xy[6].y = 4;
+        debug_xy[7].x = 5.3f;
+        debug_xy[7].y = 3.2f;
+        debug_xy[8].x = 5;
+        debug_xy[8].y = 1;
+        debug_xy[9].x = 6;
+        debug_xy[9].y = 2;
+        debug_xy[10].x = 10;
+        debug_xy[10].y = 1.4;
+        debug_xy[11].x = 9;
+        debug_xy[11].y = 9;
+        state = RANSAC_iteration_circle(&debug_ransac, debug_xy, sizeof(debug_xy) / sizeof(CARTESIANCOORDINATE));
         dt = DWT_GetDeltaT(&timeline);
     }
 }

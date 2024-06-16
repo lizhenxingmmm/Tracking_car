@@ -6,6 +6,10 @@
         "crc8_8540.h": "c",
         "freertos.h": "c",
         "vector_spec.h": "c",
-        "bsp_dwt.h": "c"
+        "bsp_dwt.h": "c",
+        "arm_math.h": "c",
+        "ransac.h": "c",
+        "math.h": "c",
+        "time.h": "c"
     }
 }
