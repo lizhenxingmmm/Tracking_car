@@ -28,10 +28,13 @@ Project File Date:  06/16/2024
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\keil\ARM\ARMCC\Bin'
 Build target 'Laser_Tracking'
 compiling TrackingTask.c...
+..\tasks\TrackingTask.c(64): warning:  #177-D: variable "start_index"  was declared but never referenced
+          int start_index = (int)(123.4f / 0.8f);
+..\tasks\TrackingTask.c: 1 warning, 0 errors
 linking...
-Program Size: Code=23840 RO-data=1184 RW-data=300 ZI-data=39436  
+Program Size: Code=23752 RO-data=1184 RW-data=292 ZI-data=24948  
 FromELF: creating hex file...
-"Laser_Tracking\Laser_Tracking.axf" - 0 Error(s), 0 Warning(s).
+"Laser_Tracking\Laser_Tracking.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -55,7 +58,7 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE:5.5.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

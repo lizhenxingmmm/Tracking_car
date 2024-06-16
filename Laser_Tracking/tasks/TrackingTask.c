@@ -19,7 +19,7 @@
 #include "arm_math.h"
 #include "RANSAC.h"
 
-#define RAW_POINTS_DATA_SPACE (1000)
+#define RAW_POINTS_DATA_SPACE (450) //涵盖360°的点云
 #define FITERED_POINTS_DATA_SPACE (180)
 
 float d_theta = 2 * PI / FITERED_POINTS_DATA_SPACE;
@@ -31,14 +31,9 @@ uint32_t error_occur = 0;
 uint32_t total_count = 0;
 float LossPackRate = 0;
 uint16_t forward_angle = 10723; //测出来的
-uint16_t start2end;             //一帧报文扫过的角度
+uint16_t start2end = 1200;      //一帧报文扫过的角度
 //创建坐标空间
-//两个空间，防止排序中写入数据导致数据更新出问题
-POLAR_COORDINATE polar_coordinate_points[RAW_POINTS_DATA_SPACE]; //未排序坐标空间
-POLAR_COORDINATE sorted_points[RAW_POINTS_DATA_SPACE];           //已经排序坐标空间
-uint16_t target_index = 0;
-POLAR_COORDINATE modified_points[FITERED_POINTS_DATA_SPACE];
-float cuvatures[FITERED_POINTS_DATA_SPACE] = {0, 0, 0, 0, 0, 0, 0, 0};
+POLAR_COORDINATE polar_coordinate_points[RAW_POINTS_DATA_SPACE];
 
 void N10laser_decode(volatile uint8_t buf[]);
 int partition(POLAR_COORDINATE points[], int low, int high);
@@ -50,6 +45,10 @@ float GetCuvature(POLAR_COORDINATE *current_point, POLAR_COORDINATE *next_point,
 uint32_t timeline;
 double dt;
 
+RANSAC_def ransac_circle;
+RANSAC_def circle_state;
+
+// debug
 CARTESIANCOORDINATE debug_xy[12];
 RANSAC_def debug_ransac;
 RANSAC_STATE state;
@@ -58,13 +57,14 @@ void StartTrackingTask(void const *argument)
 {
     USART_Init(&huart5, N10laser_decode);
     RANSAC_Init(&debug_ransac, CIRCLE, 0.41, 1.0f / 6, 0.99, 10);
+    RANSAC_Init(&ransac_circle, CIRCLE, 30, 1.0f / 5, 0.95, 40);
     DWT_Init(168);
     for (;;)
     {
+        int start_index = (int)(123.4f / 0.8f);
         //算丢包率
         LossPackRate = (float)error_occur / total_count;
         //整理数据
-        memcpy(&sorted_points[0], &polar_coordinate_points[0], RAW_POINTS_DATA_SPACE * sizeof(POLAR_COORDINATE));
         debug_xy[0].x = 1;
         debug_xy[0].y = 1;
         debug_xy[1].x = 2.2f;
@@ -110,28 +110,22 @@ void N10laser_decode(volatile uint8_t buf[])
         N10laser_.period = ((uint16_t)buf[3] << 8) + buf[4];
         N10laser_.start_angle = ((uint16_t)buf[5] << 8) + buf[6];
         N10laser_.end_angle = ((uint16_t)buf[55] << 8) + buf[56];
-        if (N10laser_.end_angle > N10laser_.start_angle)
-            start2end = N10laser_.end_angle - N10laser_.start_angle;
-        else
-            start2end = N10laser_.end_angle + 36000 - N10laser_.start_angle;
+        int start_index = (int)(N10laser_.start_angle / 100 / 0.8f);
         for (int i = 0; i < 16; i++)
         {
             N10laser_.pcdt[i].distance = ((uint16_t)buf[7 + 3 * i] << 8) + buf[8 + 3 * i];
             N10laser_.pcdt[i].peak = buf[9 + 3 * i];
             if (N10laser_.pcdt[i].peak > 15) //扫到黑色东西就排除掉
             {
-                POLAR_COORDINATE temp_coordinate;
-                temp_coordinate.rho = ((float)N10laser_.pcdt[i].distance);
-                temp_coordinate.theta = (float)(N10laser_.start_angle + ((float)i) * start2end / 15) / 100;
-                if (temp_coordinate.theta > 360)
+                if (start_index + i >= RAW_POINTS_DATA_SPACE)
                 {
-                    temp_coordinate.theta -= 360;
+                    polar_coordinate_points[start_index + i - RAW_POINTS_DATA_SPACE].rho = N10laser_.pcdt[i].distance;
+                    polar_coordinate_points[start_index + i - RAW_POINTS_DATA_SPACE].theta = (float)(N10laser_.start_angle + ((float)i) * start2end / 15) / 100 - 360;
                 }
-                memcpy(&polar_coordinate_points[target_index], &temp_coordinate, sizeof(POLAR_COORDINATE));
-                target_index++;
-                if (target_index >= 1000)
+                else
                 {
-                    target_index = 0;
+                    polar_coordinate_points[start_index + i].rho = N10laser_.pcdt[i].distance;
+                    polar_coordinate_points[start_index + i].theta = (float)(N10laser_.start_angle + ((float)i) * start2end / 15) / 100;
                 }
             }
         }
