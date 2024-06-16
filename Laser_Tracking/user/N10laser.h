@@ -1,6 +1,9 @@
 #ifndef N10LASER_H
 #define N10LASER_H
-
+/**
+ * @note  测量精度 +-3cm
+ * @note  最小测量距离 50cm
+ */
 typedef __packed struct
 {
     unsigned short distance; //距离

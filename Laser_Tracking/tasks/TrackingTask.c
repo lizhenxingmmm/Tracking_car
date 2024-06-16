@@ -49,6 +49,8 @@ float GetCuvature(POLAR_COORDINATE *current_point, POLAR_COORDINATE *next_point,
 uint32_t timeline;
 double dt;
 
+float debug__;
+
 void StartTrackingTask(void const *argument)
 {
     USART_Init(&huart5, N10laser_decode);
@@ -80,7 +82,11 @@ void StartTrackingTask(void const *argument)
                 cuvatures[i] = GetCuvature(&modified_points[i], &modified_points[i + 1], &modified_points[i + 2]);
             }
         }
-
+        // 5.27535534，4.7853508，5.27535534
+        POLAR_COORDINATE de = {10.27535534f};
+        POLAR_COORDINATE dee = {10.27535534f};
+        POLAR_COORDINATE deee = {10.27535534f};
+        debug__ = GetCuvature(&de, &dee, &deee);
         dt = DWT_GetDeltaT(&timeline);
     }
 }
@@ -112,7 +118,7 @@ void N10laser_decode(volatile uint8_t buf[])
             if (N10laser_.pcdt[i].peak > 15) //扫到黑色东西就排除掉
             {
                 POLAR_COORDINATE temp_coordinate;
-                temp_coordinate.rho = ((float)N10laser_.pcdt[i].distance) / 100;
+                temp_coordinate.rho = ((float)N10laser_.pcdt[i].distance);
                 temp_coordinate.theta = (float)(N10laser_.start_angle + ((float)i) * start2end / 15) / 100;
                 if (temp_coordinate.theta > 360)
                 {
@@ -202,7 +208,7 @@ void filter_point(POLAR_COORDINATE sorted_points_[], POLAR_COORDINATE modified_p
     int index_ = 360 / FITERED_POINTS_DATA_SPACE;
     for (int i = 0; i < RAW_POINTS_DATA_SPACE; i++)
     {
-        for (int j = 0; j < FITERED_POINTS_DATA_SPACE / index_; j++)
+        for (int j = 0; j < FITERED_POINTS_DATA_SPACE; j++)
         {
             if (fabs(sorted_points_[i].theta - (j + 0.5) * index_) < 0.5 * index_ || sorted_points_[i].theta == j * index_)
             {
@@ -211,7 +217,7 @@ void filter_point(POLAR_COORDINATE sorted_points_[], POLAR_COORDINATE modified_p
             }
         }
     }
-    for (int i = 0; i < FITERED_POINTS_DATA_SPACE / index_; i++)
+    for (int i = 0; i < FITERED_POINTS_DATA_SPACE; i++)
     {
         modified_pts[i].theta = i * index_;
         if (num[i] == 0)

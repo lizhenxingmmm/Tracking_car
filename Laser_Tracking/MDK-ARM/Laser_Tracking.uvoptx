@@ -250,6 +250,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>sorted_points</ItemText>
         </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>debug__</ItemText>
+        </Ww>
       </WatchWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>
