@@ -1050,8 +1050,8 @@ I (../Middlewares/Third_Party/FreeRTOS/Source/include/timers.h)(0x65D82FB2)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h)(0x65D82FB2)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h)(0x65D82FB2)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h)(0x65D82FB2)
-F (..\user\RANSAC.c)(0x666E9F3E)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/ARM/DSP/Inc -I ../user -I ..\tasks-I.\RTE\_Laser_Tracking-ID:\keil\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\keil\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o laser_tracking\ransac.o --omf_browse laser_tracking\ransac.crf --depend laser_tracking\ransac.d)
-I (..\user\RANSAC.h)(0x666E9A73)
+F (..\user\RANSAC.c)(0x666FDB87)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/ARM/DSP/Inc -I ../user -I ..\tasks-I.\RTE\_Laser_Tracking-ID:\keil\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\keil\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o laser_tracking\ransac.o --omf_browse laser_tracking\ransac.crf --depend laser_tracking\ransac.d)
+I (..\user\RANSAC.h)(0x666FD465)
 I (../Middlewares/ST/ARM/DSP/Inc/arm_math.h)(0x662A5A2E)
 I (../Drivers/CMSIS/Include/core_cm4.h)(0x65D82FB0)
 I (D:\keil\ARM\ARMCC\include\stdint.h)(0x6025237E)
@@ -1063,7 +1063,7 @@ I (D:\keil\ARM\ARMCC\include\math.h)(0x60252378)
 I (D:\keil\ARM\ARMCC\include\stdlib.h)(0x60252374)
 I (D:\keil\ARM\ARMCC\include\time.h)(0x60252378)
 F (../Middlewares/ST/ARM/DSP/Lib/arm_cortexM4l_math.lib)(0x662A5A2E)()
-F (..\tasks\TrackingTask.c)(0x666F0DC2)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/ARM/DSP/Inc -I ../user -I ..\tasks-I.\RTE\_Laser_Tracking-ID:\keil\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\keil\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o laser_tracking\trackingtask.o --omf_browse laser_tracking\trackingtask.crf --depend laser_tracking\trackingtask.d)
+F (..\tasks\TrackingTask.c)(0x66701152)(--c99 -c --cpu Cortex-M4.fp.sp -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Middlewares/ST/ARM/DSP/Inc -I ../user -I ..\tasks-I.\RTE\_Laser_Tracking-ID:\keil\ARM\PACK\ARM\CMSIS\5.8.0\CMSIS\Core\Include-ID:\keil\ARM\PACK\Keil\STM32F4xx_DFP\2.17.1\Drivers\CMSIS\Device\ST\STM32F4xx\Include-D__UVISION_VERSION="535" -D_RTE_ -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx -DARM_MATH_CM4 -D__FPU_USED="1U" -D__FPU_PRESENT="1U" -D__CC_ARM -DARM_MATH_MATRIX_CHECK -DARM_MATH_ROUNDING-o laser_tracking\trackingtask.o --omf_browse laser_tracking\trackingtask.crf --depend laser_tracking\trackingtask.d)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h)(0x65D82FB2)
 I (D:\keil\ARM\ARMCC\include\stddef.h)(0x6025237E)
 I (D:\keil\ARM\ARMCC\include\stdint.h)(0x6025237E)
@@ -1118,6 +1118,6 @@ I (../user/crc8_8540.h)(0x6665E629)
 I (../user/bsp_dwt.h)(0x666D173D)
 I (D:\keil\ARM\ARMCC\include\math.h)(0x60252378)
 I (../Middlewares/ST/ARM/DSP/Inc/arm_math.h)(0x662A5A2E)
-I (../user/RANSAC.h)(0x666E9A73)
+I (../user/RANSAC.h)(0x666FD465)
 I (D:\keil\ARM\ARMCC\include\stdlib.h)(0x60252374)
 I (D:\keil\ARM\ARMCC\include\time.h)(0x60252378)

@@ -45,7 +45,7 @@ typedef struct
 } RANSAC_def;
 
 void GetRandomArray(int num[], int len, int type, int min, int max);
-void GetCircle(CARTESIANCOORDINATE xy[3], CIRCLE_def *circle);
+uint8_t GetCircle(CARTESIANCOORDINATE xy[3], CIRCLE_def *circle);
 float GetDistance(CARTESIANCOORDINATE *start, CARTESIANCOORDINATE *end);
 RANSAC_STATE RANSAC_iteration_circle(RANSAC_def *ransac_def, CARTESIANCOORDINATE *xy, int dot_num);
 void RANSAC_Init(RANSAC_def *ransac_def, MODEL_TYPE model_type, float error_tolerant, float priori_w, float accuracy_you_want, float threshold);

@@ -21,6 +21,7 @@
 
 #define RAW_POINTS_DATA_SPACE (450) //涵盖360°的点云
 #define FITERED_POINTS_DATA_SPACE (180)
+#define SEGMENT_POINTS_DATA_SPACE (50) // 40°
 
 float d_theta = 2 * PI / FITERED_POINTS_DATA_SPACE;
 
@@ -30,10 +31,13 @@ N10laser N10laser_;
 uint32_t error_occur = 0;
 uint32_t total_count = 0;
 float LossPackRate = 0;
-uint16_t forward_angle = 10723; //测出来的
-uint16_t start2end = 1200;      //一帧报文扫过的角度
+uint16_t forward_angle;
+uint16_t start2end = 1200; //一帧报文扫过的角度
 //创建坐标空间
 POLAR_COORDINATE polar_coordinate_points[RAW_POINTS_DATA_SPACE];
+CARTESIANCOORDINATE pc_xy[RAW_POINTS_DATA_SPACE];
+//分块坐标空间
+CARTESIANCOORDINATE segment_pc[RAW_POINTS_DATA_SPACE / SEGMENT_POINTS_DATA_SPACE][SEGMENT_POINTS_DATA_SPACE];
 
 void N10laser_decode(volatile uint8_t buf[]);
 int partition(POLAR_COORDINATE points[], int low, int high);
@@ -41,55 +45,45 @@ void quick_sort(POLAR_COORDINATE points[], int low, int high);
 void bubble_sort(POLAR_COORDINATE points[], int low, int high);
 void filter_point(POLAR_COORDINATE sorted_point[], POLAR_COORDINATE modified_points[]);
 float GetCuvature(POLAR_COORDINATE *current_point, POLAR_COORDINATE *next_point, POLAR_COORDINATE *next_next_point);
+void pol2xy(CARTESIANCOORDINATE *xy, POLAR_COORDINATE *pol, int len);
 
 uint32_t timeline;
 double dt;
 
-RANSAC_def ransac_circle;
-RANSAC_def circle_state;
-
-// debug
-CARTESIANCOORDINATE debug_xy[12];
-RANSAC_def debug_ransac;
-RANSAC_STATE state;
+RANSAC_def ransac_circle[RAW_POINTS_DATA_SPACE / SEGMENT_POINTS_DATA_SPACE];
+RANSAC_STATE state_circle[RAW_POINTS_DATA_SPACE / SEGMENT_POINTS_DATA_SPACE];
 
 void StartTrackingTask(void const *argument)
 {
     USART_Init(&huart5, N10laser_decode);
-    RANSAC_Init(&debug_ransac, CIRCLE, 0.41, 1.0f / 6, 0.99, 10);
-    RANSAC_Init(&ransac_circle, CIRCLE, 30, 1.0f / 5, 0.95, 40);
+    // debug
+    for (int i = 0; i < RAW_POINTS_DATA_SPACE; i++)
+    {
+        pc_xy[i].x = i;
+        pc_xy[i].y = i;
+    }
+    for (int i = 0; i < RAW_POINTS_DATA_SPACE / SEGMENT_POINTS_DATA_SPACE; i++)
+    {
+        RANSAC_Init(&ransac_circle[i], CIRCLE, 30, 2.0f / 5, 0.995, 40);
+    }
     DWT_Init(168);
     for (;;)
     {
-        int start_index = (int)(123.4f / 0.8f);
         //算丢包率
         LossPackRate = (float)error_occur / total_count;
-        //整理数据
-        debug_xy[0].x = 1;
-        debug_xy[0].y = 1;
-        debug_xy[1].x = 2.2f;
-        debug_xy[1].y = 0.1f;
-        debug_xy[2].x = 1;
-        debug_xy[2].y = 2;
-        debug_xy[3].x = 2;
-        debug_xy[3].y = 4;
-        debug_xy[4].x = 3;
-        debug_xy[4].y = 0;
-        debug_xy[5].x = 3;
-        debug_xy[5].y = 4.5f;
-        debug_xy[6].x = 4;
-        debug_xy[6].y = 4;
-        debug_xy[7].x = 5.3f;
-        debug_xy[7].y = 3.2f;
-        debug_xy[8].x = 5;
-        debug_xy[8].y = 1;
-        debug_xy[9].x = 6;
-        debug_xy[9].y = 2;
-        debug_xy[10].x = 10;
-        debug_xy[10].y = 1.4;
-        debug_xy[11].x = 9;
-        debug_xy[11].y = 9;
-        state = RANSAC_iteration_circle(&debug_ransac, debug_xy, sizeof(debug_xy) / sizeof(CARTESIANCOORDINATE));
+
+        pol2xy(pc_xy, polar_coordinate_points, RAW_POINTS_DATA_SPACE);
+        int size_p = sizeof(CARTESIANCOORDINATE);
+        memcpy(&segment_pc[0][0], &pc_xy[-SEGMENT_POINTS_DATA_SPACE / 2 + RAW_POINTS_DATA_SPACE], size_p * SEGMENT_POINTS_DATA_SPACE / 2);
+        memcpy(&segment_pc[0][SEGMENT_POINTS_DATA_SPACE / 2], &pc_xy[0], size_p * SEGMENT_POINTS_DATA_SPACE / 2);
+        for (int i = 0; i < RAW_POINTS_DATA_SPACE / SEGMENT_POINTS_DATA_SPACE - 1; i++)
+        {
+            memcpy(&segment_pc[i + 1][0], &pc_xy[SEGMENT_POINTS_DATA_SPACE * (2 * i + 1) / 2], size_p * SEGMENT_POINTS_DATA_SPACE);
+        }
+        for (int i = 0; i < RAW_POINTS_DATA_SPACE / SEGMENT_POINTS_DATA_SPACE; i++)
+        {
+            state_circle[i] = RANSAC_iteration_circle(&ransac_circle[i], segment_pc[i], SEGMENT_POINTS_DATA_SPACE);
+        }
         dt = DWT_GetDeltaT(&timeline);
     }
 }
@@ -243,4 +237,13 @@ float GetCuvature(POLAR_COORDINATE *current_point, POLAR_COORDINATE *next_point,
         return 0;
     }
     return (r * r + 2 * r_dot * r_dot - r * r_dot_dot) / (temp1 * temp2);
+}
+
+void pol2xy(CARTESIANCOORDINATE *xy, POLAR_COORDINATE *pol, int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        xy[i].x = pol[i].rho * arm_cos_f32(pol[i].theta);
+        xy[i].y = pol[i].rho * arm_sin_f32(pol[i].theta);
+    }
 }

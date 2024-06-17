@@ -12,7 +12,19 @@ CIRCLE_def debug_circle;
 int debug_random_num[3];
 RANSAC_STATE RANSAC_iteration_circle(RANSAC_def *ransac_def, CARTESIANCOORDINATE *xy, int dot_num)
 {
+    int num_zero;
     if (xy == 0) //空指针
+    {
+        return RANSAC_ERROR;
+    }
+    for (int i = 0; i < dot_num; i++)
+    {
+        if (xy[i].x == 0 && xy[i].y == 0)
+        {
+            num_zero++;
+        }
+    }
+    if (num_zero > dot_num - 10)
     {
         return RANSAC_ERROR;
     }
@@ -25,15 +37,29 @@ RANSAC_STATE RANSAC_iteration_circle(RANSAC_def *ransac_def, CARTESIANCOORDINATE
             CARTESIANCOORDINATE sample_dots[3]; //数据点
             CIRCLE_def fitting_circle;          //拟合圆
             int random_num[3];                  //随机数
-            int inner_dot_num;
+            int inner_dot_num = 0;              //写了个逆天bug,好像这个数每次分配都会用相同的内存，必须置零！
             GetRandomArray(random_num, 3, 1, 0, dot_num);
-            GetRandomArray(debug_random_num, 3, 1, 0, dot_num);
             for (int i = 0; i < 3; i++)
             {
                 sample_dots[i] = xy[random_num[i]];
             }
             //笛卡尔坐标系拟合圆
             GetCircle(sample_dots, &fitting_circle);
+            while (isnan(fitting_circle.origin.x) || isnan(fitting_circle.origin.x))
+            {
+                GetRandomArray(random_num, 3, 1, 0, dot_num);
+                for (int i = 0; i < 3; i++)
+                {
+                    random_num[i] += 1;
+                    if (random_num[i] >= dot_num)
+                    {
+                        random_num[i] -= dot_num;
+                    }
+                    sample_dots[i] = xy[random_num[i]];
+                }
+                //笛卡尔坐标系拟合圆
+                GetCircle(sample_dots, &fitting_circle);
+            }
             for (int j = 0; j < dot_num; j++)
             {
                 if (j == random_num[0] || j == random_num[1] || j == random_num[2])
@@ -49,7 +75,7 @@ RANSAC_STATE RANSAC_iteration_circle(RANSAC_def *ransac_def, CARTESIANCOORDINATE
                 }
             }
             debug_circle = fitting_circle;
-            if (inner_dot_num >= ransac_def->threshold)
+            if (inner_dot_num > (ransac_def->threshold))
             {
                 ransac_def->target_circle = fitting_circle;
                 return RANSAC_OK; //迭代结束
@@ -63,7 +89,10 @@ RANSAC_STATE RANSAC_iteration_circle(RANSAC_def *ransac_def, CARTESIANCOORDINATE
     }
 }
 
-void GetCircle(CARTESIANCOORDINATE xy[3], CIRCLE_def *circle)
+/**
+ * @return 返回1则成功，0不成功
+ */
+uint8_t GetCircle(CARTESIANCOORDINATE xy[3], CIRCLE_def *circle)
 {
     float x1, y1, x2, y2, x3, y3;
     x1 = xy[0].x;
@@ -79,6 +108,7 @@ void GetCircle(CARTESIANCOORDINATE xy[3], CIRCLE_def *circle)
     circle->origin.x = -b / (2 * a);
     circle->origin.y = -c / (2 * a);
     arm_sqrt_f32((b * b + c * c - 4 * a * d) / (4 * a * a), &(circle->radius));
+    return 1;
 }
 
 float GetDistance(CARTESIANCOORDINATE *start, CARTESIANCOORDINATE *end)
